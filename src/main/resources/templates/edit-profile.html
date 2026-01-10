@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile | Enterprise Portal</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        body { font-family: 'Public Sans', sans-serif; background-color: #f8fafc; min-height: 100vh; }
+        .edit-card { border: none; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); background: white; }
+        .form-label { font-weight: 600; font-size: 0.85rem; color: #475569; }
+        .profile-preview { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid #e2e8f0; }
+        .input-group-text { background-color: #f8fafc; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom mb-4 shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/dashboard">
+                <i class="bi bi-shield-lock-fill text-primary me-2"></i>Enterprise Portal
+            </a>
+            <a href="/dashboard" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Back
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div th:if="${param.error}" class="alert alert-danger border-0 shadow-sm mb-4">
+                    <i class="bi bi-exclamation-circle-fill me-2"></i> Passwords do not match. Please try again.
+                </div>
+
+                <div class="card edit-card p-4">
+                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                        <img th:src="${user.photoUrl != null ? user.photoUrl : 'https://ui-avatars.com/api/?name=' + user.fullName}" 
+                             class="profile-preview me-3" alt="User Avatar">
+                        <div>
+                            <h5 class="fw-bold mb-0">Account Settings</h5>
+                            <p class="text-muted small mb-0" th:text="${user.email}"></p>
+                        </div>
+                    </div>
+
+                    <form th:action="@{/update-profile}" method="post">
+                        <div class="mb-4">
+                            <label class="form-label">Full Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" name="fullName" th:value="${user.fullName}" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-light rounded-3 mb-4">
+                            <h6 class="fw-bold mb-3"><i class="bi bi-lock me-2"></i>Change Password</h6>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">New Password</label>
+                                <input type="password" name="newPassword" class="form-control" placeholder="Enter new password">
+                            </div>
+
+                            <div class="mb-1">
+                                <label class="form-label">Confirm Password</label>
+                                <input type="password" name="confirmPassword" class="form-control" placeholder="Confirm new password">
+                            </div>
+                            <small class="text-muted">Leave password fields blank to keep current password.</small>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary fw-bold py-2">Save Changes</button>
+                            <a href="/dashboard" class="btn btn-link text-decoration-none text-muted small">Discard Changes</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

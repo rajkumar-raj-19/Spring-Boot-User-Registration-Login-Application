@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Portal | Register</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        body, html { 
+            height: 100vh; margin: 0; font-family: 'Public Sans', sans-serif; 
+            overflow: hidden; background-color: #fff; 
+        }
+        
+        .main-wrapper { display: flex; height: 100vh; width: 100vw; }
+        
+        .visual-side {
+            flex: 1.2;
+            background: linear-gradient(rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.4)), 
+                        url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1600&q=80');
+            background-size: cover; background-position: center; display: none;
+        }
+
+        @media (min-width: 992px) { .visual-side { display: block; } }
+
+        .register-side { 
+            flex: 1; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; padding: 1.5rem; 
+        }
+
+        /* Entrance Animation */
+        .auth-card { 
+            width: 100%; max-width: 360px; 
+            animation: fadeInSlideUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInSlideUp {
+            from { opacity: 0; transform: translateY(25px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo-wrapper {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1rem auto; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .logo-inner { color: white; font-size: 1.4rem; }
+        .form-control { 
+            padding: 0.6rem 0.75rem; border-radius: 8px; 
+            border: 1px solid #d1d5db; background-color: #f9fafb; font-size: 0.9rem;
+        }
+
+        .btn-submit { 
+            background-color: #1e293b; color: white; border: none; 
+            padding: 0.7rem; font-weight: 600; border-radius: 8px; 
+            width: 100%; margin-top: 0.5rem; transition: 0.3s;
+        }
+
+        .btn-submit:disabled { background-color: #cbd5e1; cursor: not-allowed; }
+        .btn-submit:not(:disabled):hover { background-color: #0f172a; transform: translateY(-1px); }
+
+        /* Spinner Styles */
+        .spinner-border-sm { display: none; margin-right: 8px; vertical-align: middle; }
+        .loading-text { display: none; }
+        
+        .btn-submit.loading .spinner-border-sm { display: inline-block; }
+        .btn-submit.loading .btn-text { display: none; }
+        .btn-submit.loading .loading-text { display: inline-block; }
+
+        .input-group-text { background-color: #f9fafb; border-right: none; color: #9ca3af; }
+        .form-control.has-icon { border-left: none; }
+        .form-check-input:checked { background-color: #10b981; border-color: #10b981; }
+
+        @media (max-height: 700px) { .auth-card { transform: scale(0.9); } }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <div class="visual-side"></div>
+
+        <div class="register-side">
+            <div class="auth-card">
+                <div class="logo-wrapper">
+                    <div class="logo-inner"><i class="bi bi-person-plus-fill"></i></div>
+                </div>
+                
+                <div class="text-center">
+                    <h3 class="fw-bold">Create Account</h3>
+                    <p class="text-muted small">Login Here......</p>
+                </div>
+
+                <form th:action="@{/register}" method="post" id="registerForm">
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">Full Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text" name="fullName" class="form-control has-icon" placeholder="Enter Name" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">Work Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input type="email" name="email" class="form-control has-icon" placeholder="Enter Email" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Create Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input type="password" id="regPass" name="password" class="form-control has-icon" placeholder="Enter Password" required>
+                            <span class="input-group-text" style="cursor: pointer;" onclick="toggleRegPass()">
+                                <i class="bi bi-eye-slash" id="toggleIcon"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="termsCheck">
+                        <label class="form-check-label text-muted" for="termsCheck">
+                            I agree to the <a href="#" class="text-success text-decoration-none fw-bold">Terms</a> and <a href="#" class="text-success text-decoration-none fw-bold">Privacy Policy</a>.
+                        </label>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn btn-submit" disabled>
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span class="btn-text">Initialize Account</span>
+                        <span class="loading-text">Creating Account...</span>
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <p class="small text-muted">Already have an account? 
+                        <a th:href="@{/login}" class="text-success fw-bold text-decoration-none">Login Here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const registerForm = document.getElementById('registerForm');
+        const termsCheck = document.getElementById('termsCheck');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // 1. Password Toggle Logic
+        function toggleRegPass() {
+            const passInput = document.getElementById('regPass');
+            const icon = document.getElementById('toggleIcon');
+            if (passInput.type === "password") {
+                passInput.type = "text";
+                icon.classList.replace("bi-eye-slash", "bi-eye");
+            } else {
+                passInput.type = "password";
+                icon.classList.replace("bi-eye", "bi-eye-slash");
+            }
+        }
+
+        // 2. Terms Check Logic
+        termsCheck.addEventListener('change', function() {
+            submitBtn.disabled = !this.checked;
+        });
+
+        // 3. Loading Spinner Logic
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+
+            // Submit after a short delay for visual feedback
+            setTimeout(() => {
+                registerForm.submit();
+            }, 600);
+        });
+    </script>
+</body>
+</html>
