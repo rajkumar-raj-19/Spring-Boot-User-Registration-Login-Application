@@ -16,7 +16,7 @@
             height: 100vh; 
             margin: 0; 
             font-family: 'Public Sans', sans-serif; 
-            overflow: hidden !important; /* !important ensures no scrollbars appear */
+            overflow: hidden !important; 
             background-color: #fff; 
         }
         
@@ -39,6 +39,10 @@
             position: relative; 
             z-index: 20; 
             animation: fadeInSlideUp 0.8s ease-out;
+            /* Added constraint */
+            max-height: 98vh;
+            display: flex;
+            flex-direction: column;
         }
 
         @keyframes fadeInSlideUp {
@@ -46,15 +50,28 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Fixed Spacing for Logo and Header */
         .logo-wrapper {
-            width: 50px; height: 50px;
+            width: 45px; height: 45px;
             background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
             border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 1rem auto; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            margin: 0 auto 0.5rem auto !important; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
         }
 
-        .logo-inner { color: white; font-size: 1.6rem; }
+        .logo-inner { color: white; font-size: 1.4rem; }
+        
+        /* Adjusted margin for header text */
+        .header-section { margin-bottom: 1rem !important; }
+
         .form-control { padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid #d1d5db; background-color: #f9fafb; }
+
+        /* Compact Error Alert */
+        .alert-danger {
+            margin-bottom: 0.8rem !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+            font-size: 0.85rem;
+        }
 
         .btn-submit { 
             background-color: #1e293b; color: white; border: none; 
@@ -72,10 +89,13 @@
         .btn-submit.loading .loading-text { display: inline-block; }
 
         .btn-google { border: 1px solid #e5e7eb; padding: 0.6rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #374151; text-decoration: none; width: 100%; font-size: 0.9rem; }
-        .divider { display: flex; align-items: center; text-align: center; margin: 1rem 0; color: #9ca3af; font-size: 0.7rem; }
+        .divider { display: flex; align-items: center; text-align: center; margin: 0.8rem 0; color: #9ca3af; font-size: 0.7rem; }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #f3f4f6; }
         .divider:not(:empty)::before { margin-right: 1rem; }
         .divider:not(:empty)::after { margin-left: 1rem; }
+
+        /* Footer Spacing */
+        .footer-link { margin-top: 0.8rem !important; padding-top: 0.8rem !important; }
     </style>
 </head>
 <body>
@@ -88,12 +108,12 @@
                     <div class="logo-inner"><i class="bi bi-shield-lock-fill"></i></div>
                 </div>
                 
-                <div class="text-center mb-4">
-                    <h3 class="fw-bold">Login Portal</h3>
-                    <p class="text-muted small">Authorized Employee Access Only</p>
+                <div class="text-center header-section">
+                    <h3 class="fw-bold mb-1">Login Portal</h3>
+                    <p class="text-muted small mb-0">Authorized Employee Access Only</p>
                 </div>
 
-                <div th:if="${param.error}" class="alert alert-danger py-2 small border-0 mb-3 text-center">
+                <div th:if="${param.error}" class="alert alert-danger border-0 text-center">
                     <i class="bi bi-exclamation-circle me-1"></i> Invalid Email or Password
                 </div>
 
@@ -107,7 +127,7 @@
                         <input type="password" name="password" class="form-control" placeholder="Enter Password" required>
                     </div>
                     
-                    <div class="mb-3 text-end">
+                    <div class="mb-2 text-end">
                         <a th:href="@{/forgot-password}" class="text-primary small text-decoration-none fw-bold">Forgot Password?</a>
                     </div>
 
@@ -125,7 +145,7 @@
                     Continue with Google
                 </a>
 
-                <div class="text-center mt-4 border-top pt-3">
+                <div class="text-center footer-link border-top">
                     <p class="small text-muted mb-0">New Employee? <a th:href="@{/register}" class="text-primary fw-bold text-decoration-none">Create Account</a></p>
                 </div>
             </div>
@@ -136,10 +156,8 @@
         const loginForm = document.getElementById('loginForm');
         const submitBtn = document.getElementById('submitBtn');
 
-        // Handling Form Submission with Loading State
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
-
             submitBtn.classList.add('loading');
             submitBtn.disabled = true;
             submitBtn.style.opacity = '0.8';
@@ -149,11 +167,9 @@
             }, 600);
         });
 
-        // SweetAlert2 Popups for URL Parameters
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             
-            // 1. Account Created Popup
             if (urlParams.has('success')) {
                 Swal.fire({ 
                     title: 'Success!', 
@@ -163,7 +179,6 @@
                 });
             }
             
-            // 2. Password Reset Popup
             if (urlParams.has('resetSuccess')) {
                 Swal.fire({ 
                     title: 'Updated!', 
@@ -173,7 +188,6 @@
                 });
             }
 
-            // 3. Account Deleted Popup
             if (urlParams.has('deleted')) {
                 Swal.fire({ 
                     title: 'Account Deleted', 
