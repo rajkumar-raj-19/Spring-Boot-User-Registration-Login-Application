@@ -24,12 +24,57 @@
         
         .visual-side {
             flex: 1.2;
-            background: linear-gradient(to right, rgba(0,0,0,0.1), rgba(0,0,0,0.3)), 
+            background: linear-gradient(to right, rgba(0,0,0,0.3), rgba(0,0,0,0.5)), 
                         url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1600&q=80');
-            background-size: cover; background-position: center; display: none;
+            background-size: cover; 
+            background-position: center; 
+            display: none;
+            /* Flex properties to center the clock */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
 
-        @media (min-width: 992px) { .visual-side { display: block; } }
+        @media (min-width: 992px) { 
+            .visual-side { display: flex; } 
+        }
+        @media (max-width: 991px) {
+            .visual-side { display: none; }
+        }
+
+        /* --- START CENTERED CLOCK CSS --- */
+        .glass-clock {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px 60px;
+            border-radius: 25px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .clock-time { 
+            font-size: 4.5rem; 
+            font-weight: 700; 
+            line-height: 1; 
+            margin-bottom: 10px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .clock-date { 
+            font-size: 1.2rem; 
+            font-weight: 500; 
+            opacity: 0.9; 
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        /* --- END CLOCK CSS --- */
 
         .login-side { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1rem; position: relative; }
         
@@ -39,7 +84,6 @@
             position: relative; 
             z-index: 20; 
             animation: fadeInSlideUp 0.8s ease-out;
-            /* Added constraint */
             max-height: 98vh;
             display: flex;
             flex-direction: column;
@@ -50,7 +94,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Fixed Spacing for Logo and Header */
         .logo-wrapper {
             width: 45px; height: 45px;
             background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
@@ -59,13 +102,9 @@
         }
 
         .logo-inner { color: white; font-size: 1.4rem; }
-        
-        /* Adjusted margin for header text */
         .header-section { margin-bottom: 1rem !important; }
-
         .form-control { padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid #d1d5db; background-color: #f9fafb; }
 
-        /* Compact Error Alert */
         .alert-danger {
             margin-bottom: 0.8rem !important;
             padding-top: 0.5rem !important;
@@ -94,14 +133,19 @@
         .divider:not(:empty)::before { margin-right: 1rem; }
         .divider:not(:empty)::after { margin-left: 1rem; }
 
-        /* Footer Spacing */
         .footer-link { margin-top: 0.8rem !important; padding-top: 0.8rem !important; }
     </style>
 </head>
 <body>
 
     <div class="main-wrapper">
-        <div class="visual-side"></div>
+        <div class="visual-side">
+            <div class="glass-clock">
+                <div id="txt" class="clock-time"></div>
+                <div id="date" class="clock-date"></div>
+            </div>
+        </div>
+        
         <div class="login-side">
             <div class="auth-card">
                 <div class="logo-wrapper">
@@ -120,7 +164,7 @@
                 <form th:action="@{/login}" method="post" id="loginForm">
                     <div class="mb-2">
                         <label class="form-label small fw-bold">Email ID</label>
-                        <input type="email" name="email" class="form-control" placeholder="Enter Email" required>
+                        <input type="email" name="username" class="form-control" placeholder="Enter Email" required>
                     </div>
                     <div class="mb-1">
                         <label class="form-label small fw-bold">Password</label>
@@ -153,6 +197,34 @@
     </div>
 
     <script th:inline="javascript">
+        // --- START CLOCK SCRIPT ---
+        function startTime() {
+            const today = new Date();
+            let h = today.getHours();
+            let m = today.getMinutes();
+            let s = today.getSeconds();
+            let ampm = h >= 12 ? 'PM' : 'AM';
+            
+            h = h % 12;
+            h = h ? h : 12; 
+            m = checkTime(m);
+            s = checkTime(s);
+            
+            document.getElementById('txt').innerHTML = h + ":" + m + ":" + s + " " + ampm;
+            
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date').innerHTML = today.toLocaleDateString(undefined, options);
+            
+            setTimeout(startTime, 1000);
+        }
+
+        function checkTime(i) {
+            if (i < 10) {i = "0" + i};  
+            return i;
+        }
+        startTime(); 
+        // --- END CLOCK SCRIPT ---
+
         const loginForm = document.getElementById('loginForm');
         const submitBtn = document.getElementById('submitBtn');
 
@@ -175,24 +247,6 @@
                     title: 'Success!', 
                     text: 'Account created. Please login.', 
                     icon: 'success', 
-                    confirmButtonColor: '#1e293b' 
-                });
-            }
-            
-            if (urlParams.has('resetSuccess')) {
-                Swal.fire({ 
-                    title: 'Updated!', 
-                    text: 'Password saved successfully.', 
-                    icon: 'success', 
-                    confirmButtonColor: '#1e293b' 
-                });
-            }
-
-            if (urlParams.has('deleted')) {
-                Swal.fire({ 
-                    title: 'Account Deleted', 
-                    text: 'Your account and data have been removed successfully.', 
-                    icon: 'info', 
                     confirmButtonColor: '#1e293b' 
                 });
             }
